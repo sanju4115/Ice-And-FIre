@@ -10,7 +10,7 @@
 CREATE TABLE public.books (
     id SERIAL PRIMARY KEY,
     name character varying(255),
-    isbn character varying(14),
+    isbn character varying(14) UNIQUE,
     authors json,
     country character varying(50),
     number_of_pages integer not null,

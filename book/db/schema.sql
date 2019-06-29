@@ -162,6 +162,14 @@ ALTER TABLE ONLY public.books ALTER COLUMN id SET DEFAULT nextval('public.books_
 
 
 --
+-- Name: books books_isbn_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.books
+    ADD CONSTRAINT books_isbn_key UNIQUE (isbn);
+
+
+--
 -- Name: books books_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
