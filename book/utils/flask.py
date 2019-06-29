@@ -14,20 +14,6 @@ class APIFlask(Flask):
         return super(APIFlask, self).make_response(rv)
 
 
-class APIResponse:
-    def __init__(self, value=None, status=HTTPStatus.OK, meta=None):
-        if meta:
-            self.payload = {"data": value, "meta": meta}
-        else:
-            self.payload = {"data": value}
-        self.status = status
-
-    def to_json(self):
-        return Response(
-            json.dumps(self.payload), status=self.status, mimetype="application/json"
-        )
-
-
 class GenericResponse:
     def __init__(self, value=None, status=HTTPStatus.OK, meta=None, message=None):
         if meta:
@@ -59,16 +45,6 @@ class APIError:
         )
 
 
-class ValidationException(Exception):
-    def __init__(self, message, status=HTTPStatus.BAD_REQUEST):
-        self.message = message
-        self.status = status
-
-    def to_json(self):
-        payload = {"message": self.message, "type": "VALIDATION_EXCEPTION"}
-        return APIError(payload, status=self.status)
-
-
 class NotFoundException(Exception):
     def __init__(self, message, status=HTTPStatus.NOT_FOUND):
         self.message = message
@@ -76,14 +52,4 @@ class NotFoundException(Exception):
 
     def to_json(self):
         payload = {"message": self.message, "type": "NOT_FOUND_EXCEPTION"}
-        return APIError(payload, status=self.status)
-
-
-class ForbiddenException(Exception):
-    def __init__(self, message, status=HTTPStatus.FORBIDDEN):
-        self.message = message
-        self.status = status
-
-    def to_json(self):
-        payload = {"message": self.message, "type": "ForbiddenException"}
         return APIError(payload, status=self.status)

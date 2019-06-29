@@ -46,13 +46,6 @@ class BookRepo:
         entities = self._db.session.query(BookEntity).all()
         return self._hydrate_multi(entities)
 
-    def create_all(self, models: List[BookModel]) -> List[BookModel]:
-        entities = self._to_entity_multi(models)
-        self._db.session.add_all(entities)
-        self._db.session.flush()
-        self._db.session.commit()
-        return self._hydrate_multi(entities)
-
     @staticmethod
     def _to_entity(model: BookModel) -> BookEntity:
         return BookEntity(

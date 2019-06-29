@@ -5,29 +5,11 @@ from flask import json, Response, Flask
 
 class APIFlask(Flask):
     def make_response(self, rv):
-        if isinstance(rv, APIResponse):
-            return rv.to_json()
         if isinstance(rv, APIError):
             return rv.to_json()
         if isinstance(rv, GenericResponse):
             return rv.to_json()
-        if isinstance(rv, B2BResponseBean):
-            return rv.to_json()
         return super(APIFlask, self).make_response(rv)
-
-
-class APIResponse:
-    def __init__(self, value=None, status=HTTPStatus.OK, meta=None):
-        if meta is None:
-            self.payload = {"data": value}
-        else:
-            self.payload = {"data": value, "meta": meta}
-        self.status = status
-
-    def to_json(self):
-        return Response(
-            json.dumps(self.payload), status=self.status, mimetype="application/json"
-        )
 
 
 class GenericResponse:
@@ -42,20 +24,6 @@ class GenericResponse:
             }
             if message:
                 self.payload["message"] = message
-        self.status = status
-
-    def to_json(self):
-        return Response(
-            json.dumps(self.payload), status=self.status, mimetype="application/json"
-        )
-
-
-class B2BResponseBean:
-    def __init__(self, value=None, status=HTTPStatus.OK, meta=None):
-        if meta:
-            self.payload = {"data": value, "meta": meta}
-        else:
-            self.payload = {"data": value, "statusCode": "0", "message": "OK"}
         self.status = status
 
     def to_json(self):

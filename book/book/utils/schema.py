@@ -32,25 +32,3 @@ def dataschema(schema):
         return new_func
 
     return decorator
-
-
-def queryschema(schema):
-    def decorator(f):
-        @wraps(f)
-        def new_func(*args, **kwargs):
-            try:
-                parsed_query_string = request.args.to_dict()
-                valid_dict = schema(parsed_query_string)
-                snaked_kwargs = {snakecase(k): v for k, v in valid_dict.items()}
-                kwargs.update(snaked_kwargs)
-            except Invalid as e:
-                message = 'Invalid query_params: %s (path "%s")' % (
-                    str(e.msg),
-                    ".".join([str(k) for k in e.path]),
-                )
-                raise ValidationException(message)
-            return f(*args, **kwargs)
-
-        return new_func
-
-    return decorator
