@@ -1,0 +1,48 @@
+version: "3"
+services:
+  common_db:
+    build:
+      context: ./common_database
+      args:
+        - POSTGRES_MULTIPLE_DATABASES=book
+        - POSTGRES_PASSWORD=shuttl_user
+        - POSTGRES_USER=shuttl_user
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: shuttl_user
+      POSTGRES_USER: shuttl_user
+    volumes:
+      - ./common_database/create_db.sh:/docker-entrypoint-initdb.d/create_db.sh
+    ports:
+      - "9221:5432"
+
+  # SUPPLY
+
+  book_dbmate:
+    build: ./dbmate-docker
+    environment:
+      DATABASE_URL: postgres://shuttl_user:shuttl_user@common_db:5432/book?sslmode=disable
+    volumes:
+      - ./book:/usr/data
+    depends_on:
+      - common_db
+    working_dir: /usr/data
+    command: bash -c  "dbwait.sh && dbmate up && dbmate dump"
+
+  book_web:
+    build: book
+    volumes:
+      - ./book:/app
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=book/app.py
+      - BOOK_DB_URL=common_db
+      - BOOK_DB_PASS=shuttl_user
+      - BOOK_DB_USER=shuttl_user
+      - BOOK_DB_NAME=book
+    depends_on:
+      - book_dbmate
+    ports:
+      - "9134:5000"
+    command: flask run --host="0.0.0.0" --reload
+
